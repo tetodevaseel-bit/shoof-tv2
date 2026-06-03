@@ -857,6 +857,23 @@
         <!-- https://issuetracker.google.com/issues/476788722 -->
         <uses-library android:name="org.apache.http.legacy" android:required="false" />
 
-    </application>
+    
+        <activity
+            android:name=".ui.ShoofSplashActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ui.ShoofWebActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:hardwareAccelerated="true"
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" />
+</application>
 
 </manifest>
