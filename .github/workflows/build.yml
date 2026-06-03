@@ -20,8 +20,10 @@ jobs:
 
       - uses: android-actions/setup-android@v3
 
-      - name: Setup NDK 27
+      - name: Install SDK 36 + NDK 27 + Build Tools
         run: |
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-36"
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "build-tools;36.1.0"
           echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "ndk;27.3.13750724"
           echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/27.3.13750724" >> $GITHUB_ENV
 
