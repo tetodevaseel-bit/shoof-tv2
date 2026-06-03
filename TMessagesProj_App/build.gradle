@@ -8,8 +8,6 @@ dependencies {
     implementation project(':TMessagesProj')
 }
 
-    ignoredBuildTypes = ["debug"]
-}
 
 android {
     defaultConfig.applicationId = APP_PACKAGE
