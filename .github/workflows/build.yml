@@ -37,7 +37,7 @@ jobs:
       - run: chmod +x gradlew
 
       - name: Build APK
-        run: ./gradlew assembleAfatDebug --no-daemon --build-cache
+        run: ./gradlew assembleDebug --no-daemon --build-cache
         env:
           ANDROID_NDK_HOME: ${{ env.ANDROID_NDK_HOME }}
           GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g"
