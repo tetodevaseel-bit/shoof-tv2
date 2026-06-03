@@ -37,7 +37,7 @@ jobs:
       - run: chmod +x gradlew
 
       - name: Build APK
-        run: ./gradlew assembleDebug --no-daemon --build-cache
+        run: ./gradlew :TMessagesProj_App:assembleRelease --no-daemon --build-cache -x lint
         env:
           ANDROID_NDK_HOME: ${{ env.ANDROID_NDK_HOME }}
           GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g"
@@ -45,5 +45,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: shoof-tv-apk
-          path: TMessagesProj/build/outputs/apk/**/*.apk
+          path: TMessagesProj_App/build/outputs/apk/**/*.apk
           retention-days: 30
