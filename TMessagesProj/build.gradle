@@ -85,7 +85,6 @@ dependencies {
     implementation 'io.sentry:sentry-android:8.42.0'
 }
 
-}
 
 android {
     sourceSets.main.jniLibs.srcDirs = ['./jni/']
