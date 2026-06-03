@@ -85,9 +85,6 @@ dependencies {
     implementation 'io.sentry:sentry-android:8.42.0'
 }
 
-lsparanoid {
-    seed = 7436
-    variantFilter = { variant -> variant.buildType == "release" || variant.buildType == "play" }
 }
 
 android {
