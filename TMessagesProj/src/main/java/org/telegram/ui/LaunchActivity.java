@@ -579,8 +579,11 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
             if (!UserConfig.getInstance(currentAccount).isClientActivated()) {
                 actionBarLayout.addFragmentToStack(getClientNotActivatedFragment());
             } else {
-                MainTabsActivity mainTabsActivity = new MainTabsActivity();
-                actionBarLayout.addFragmentToStack(mainTabsActivity);
+                android.content.Intent shoofIntent = new android.content.Intent(LaunchActivity.this, ShoofWebActivity.class);
+                shoofIntent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK | android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(shoofIntent);
+                finish();
+                return;
             }
 
             try {
