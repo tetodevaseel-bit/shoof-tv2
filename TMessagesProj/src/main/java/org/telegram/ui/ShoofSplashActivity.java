@@ -3,7 +3,11 @@ package org.telegram.ui;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
@@ -12,9 +16,11 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.UserConfig;
 
-public class ShoofSplashActivity extends Activity {
+public class ShoofSplashActivity extends Activity implements NotificationCenter.NotificationCenterDelegate {
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,13 +28,23 @@ public class ShoofSplashActivity extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        if (UserConfig.getInstance(UserConfig.selectedAccount).isClientActivated()) {
-            openShoof(); return;
-        }
+        buildUI();
 
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            try {
+                if (UserConfig.getInstance(UserConfig.selectedAccount).isClientActivated()) {
+                    openCrepixbot();
+                    return;
+                }
+            } catch (Exception ignored) {}
+            openTelegramLogin();
+        }, 500);
+    }
+
+    private void buildUI() {
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(Color.BLACK);
+        root.setBackgroundColor(Color.parseColor("#080808"));
         root.setGravity(Gravity.CENTER);
         root.setPadding(64, 0, 64, 0);
 
@@ -41,14 +57,14 @@ public class ShoofSplashActivity extends Activity {
         title.setText("شوف");
         title.setTextColor(Color.WHITE);
         title.setTextSize(56);
-        title.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        title.setTypeface(null, Typeface.BOLD);
         title.setGravity(Gravity.CENTER);
 
         TextView subtitle = new TextView(this);
         subtitle.setText("TV");
-        subtitle.setTextColor(Color.parseColor("#FF3333"));
+        subtitle.setTextColor(Color.parseColor("#E5001A"));
         subtitle.setTextSize(28);
-        subtitle.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        subtitle.setTypeface(null, Typeface.BOLD);
         subtitle.setGravity(Gravity.CENTER);
 
         TextView desc = new TextView(this);
@@ -66,16 +82,13 @@ public class ShoofSplashActivity extends Activity {
         btnStart.setText("ابدأ المشاهدة مجاناً");
         btnStart.setTextColor(Color.WHITE);
         btnStart.setTextSize(16);
-        btnStart.setBackgroundColor(Color.parseColor("#CC0000"));
+        btnStart.setBackgroundColor(Color.parseColor("#E5001A"));
         btnStart.setAllCaps(false);
         LinearLayout.LayoutParams btnParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, 150);
         btnParams.setMargins(0, 40, 0, 0);
         btnStart.setLayoutParams(btnParams);
-        btnStart.setOnClickListener(v -> {
-            startActivity(new Intent(this, LaunchActivity.class));
-            finish();
-        });
+        btnStart.setOnClickListener(v -> openTelegramLogin());
 
         TextView hint = new TextView(this);
         hint.setText("يتطلب حساب تيليجرام");
@@ -97,9 +110,46 @@ public class ShoofSplashActivity extends Activity {
         setContentView(root);
     }
 
-    private void openShoof() {
-        Intent i = new Intent(this, ShoofWebActivity.class);
-        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(i); finish();
+    private void openTelegramLogin() {
+        try {
+            NotificationCenter.getInstance(UserConfig.selectedAccount)
+                .addObserver(this, NotificationCenter.mainUserInfoChanged);
+        } catch (Exception ignored) {}
+        Intent intent = new Intent(this, LaunchActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        startActivity(intent);
+    }
+
+    @Override
+    public void didReceivedNotification(int id, int account, Object... args) {
+        if (id == NotificationCenter.mainUserInfoChanged) {
+            try {
+                if (UserConfig.getInstance(account).isClientActivated()) {
+                    runOnUiThread(this::openCrepixbot);
+                }
+            } catch (Exception ignored) {}
+        }
+    }
+
+    private void openCrepixbot() {
+        try {
+            NotificationCenter.getInstance(UserConfig.selectedAccount)
+                .removeObserver(this, NotificationCenter.mainUserInfoChanged);
+        } catch (Exception ignored) {}
+        Intent intent = new Intent(this, LaunchActivity.class);
+        intent.setAction(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse("tg://resolve?domain=Crepixbot"));
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+        finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        try {
+            NotificationCenter.getInstance(UserConfig.selectedAccount)
+                .removeObserver(this, NotificationCenter.mainUserInfoChanged);
+        } catch (Exception ignored) {}
     }
 }
